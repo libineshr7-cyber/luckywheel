@@ -35,6 +35,7 @@ app.patch('/api/admin/claims/:id/status', adminController.updateClaimStatus);
 app.delete('/api/admin/claims/:id', adminController.deleteClaim);
 app.get('/api/admin/export/csv', adminController.exportCSV);
 app.get('/api/admin/export/excel', adminController.exportExcel);
+app.post('/api/admin/reset-cooldowns', adminController.resetCooldowns);
 
 // Direct route for admin page
 app.get('/admin', (req, res) => {

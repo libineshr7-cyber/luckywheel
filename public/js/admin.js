@@ -289,6 +289,31 @@
     });
   });
 
+  const adminResetCooldownBtn = document.getElementById('adminResetCooldownBtn');
+
+  async function handleResetCooldowns() {
+    if (!confirm('Are you sure you want to reset all user spin cooldowns? All users will be able to spin again immediately.')) {
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/reset-cooldowns', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.removeItem('luxespin_device_id');
+        showToast('All user spin cooldowns reset successfully!', 'success');
+        loadDashboardData();
+      } else {
+        showToast(data.message || 'Failed to reset cooldowns', 'error');
+      }
+    } catch (err) {
+      showToast('Error sending reset request', 'error');
+    }
+  }
+
+  if (adminResetCooldownBtn) {
+    adminResetCooldownBtn.addEventListener('click', handleResetCooldowns);
+  }
+
   adminLoginForm.addEventListener('submit', handleLogin);
   adminLogoutBtn.addEventListener('click', handleLogout);
   closeDetailModalBtn.addEventListener('click', closeClaimDetailModal);

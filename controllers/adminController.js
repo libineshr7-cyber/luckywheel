@@ -320,3 +320,17 @@ exports.exportExcel = async (req, res) => {
     res.status(500).json({ success: false, message: 'Excel export failed' });
   }
 };
+
+exports.resetCooldowns = async (req, res) => {
+  try {
+    if (getDbState()) {
+      await Spin.deleteMany({});
+    } else {
+      inMemoryStore.spins = [];
+    }
+    return res.json({ success: true, message: 'All user spin cooldowns reset successfully!' });
+  } catch (error) {
+    console.error('Error resetting cooldowns:', error);
+    return res.status(500).json({ success: false, message: 'Failed to reset user cooldowns' });
+  }
+};

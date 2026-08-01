@@ -528,51 +528,111 @@
     successModal.classList.remove('active');
   }
 
+  // Restrict Phone Number input to numbers only and max 10 digits
+  const claimPhoneInput = document.getElementById('claimPhone');
+  if (claimPhoneInput) {
+    claimPhoneInput.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/[^0-9]/g, '');
+      if (val.length > 10) val = val.slice(0, 10);
+      e.target.value = val;
+    });
+  }
+
   function handleClaimSubmit() {
-    const rawName = document.getElementById('claimName').value.trim();
-    const rawEmail = document.getElementById('claimEmail').value.trim();
-    const rawPhone = document.getElementById('claimPhone').value.trim();
-    const rawAddr1 = document.getElementById('claimAddr1').value.trim();
-    const rawCity = document.getElementById('claimCity').value.trim();
-    const rawState = document.getElementById('claimState').value.trim();
-    const rawPin = document.getElementById('claimPin').value.trim();
+    const nameInput = document.getElementById('claimName');
+    const emailInput = document.getElementById('claimEmail');
+    const phoneInput = document.getElementById('claimPhone');
+    const addr1Input = document.getElementById('claimAddr1');
+    const addr2Input = document.getElementById('claimAddr2');
+    const cityInput = document.getElementById('claimCity');
+    const districtInput = document.getElementById('claimDistrict');
+    const stateInput = document.getElementById('claimState');
+    const countryInput = document.getElementById('claimCountry');
+    const pinInput = document.getElementById('claimPin');
+    const ageInput = document.getElementById('claimAge');
+    const genderInput = document.getElementById('claimGender');
+    const termsInput = document.getElementById('claimTerms');
 
-    const userName = rawName || 'Winner';
-    const addressLine1 = rawAddr1 || 'Address Registered';
-    const city = rawCity || 'City';
-    const state = rawState || 'State';
-    const pinCode = rawPin || 'PIN';
+    // Reset error styling
+    const inputsToReset = [nameInput, emailInput, phoneInput, addr1Input, cityInput, districtInput, stateInput, countryInput, pinInput, ageInput];
+    inputsToReset.forEach(inp => {
+      if (inp) inp.style.borderColor = 'var(--border-color)';
+    });
+
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const addressLine1 = addr1Input.value.trim();
+    const city = cityInput.value.trim();
+    const district = districtInput.value.trim();
+    const state = stateInput.value.trim();
+    const country = countryInput.value.trim();
+    const pinCode = pinInput.value.trim();
+    const age = ageInput.value.trim();
+    const gender = genderInput ? genderInput.value : 'Male';
+    const agreedToTerms = termsInput ? termsInput.checked : false;
+
+    let errorFields = [];
+    let customError = '';
+
+    if (!name) { nameInput.style.borderColor = '#ef4444'; errorFields.push('Full Name'); }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailInput.style.borderColor = '#ef4444';
+      errorFields.push('Valid Email');
+      if (!customError) customError = 'Please enter a valid email address.';
+    }
+    if (!phone || !/^[0-9]{10}$/.test(phone)) {
+      phoneInput.style.borderColor = '#ef4444';
+      errorFields.push('10-digit Phone Number');
+      if (!customError) customError = 'Phone number must be exactly 10 numeric digits.';
+    }
+    if (!addressLine1) { addr1Input.style.borderColor = '#ef4444'; errorFields.push('Address Line 1'); }
+    if (!city) { cityInput.style.borderColor = '#ef4444'; errorFields.push('City'); }
+    if (!district) { districtInput.style.borderColor = '#ef4444'; errorFields.push('District'); }
+    if (!state) { stateInput.style.borderColor = '#ef4444'; errorFields.push('State'); }
+    if (!country) { countryInput.style.borderColor = '#ef4444'; errorFields.push('Country'); }
+    if (!pinCode) { pinInput.style.borderColor = '#ef4444'; errorFields.push('PIN Code'); }
+    if (!age || isNaN(age) || parseInt(age, 10) < 1) { ageInput.style.borderColor = '#ef4444'; errorFields.push('Age'); }
+    if (!agreedToTerms) {
+      errorFields.push('Terms & Conditions');
+      if (!customError) customError = 'You must agree to the Terms and Conditions.';
+    }
+
+    if (errorFields.length > 0) {
+      showToast(customError || 'Please complete all mandatory fields (*)', 'error');
+      return; // STOP! DO NOT SHOW POPUP OR INVOICE!
+    }
+
     const prizeName = currentSpinState.wonPrize || 'iPhone 17 Pro Max';
-
-    const fullAddress = `${addressLine1}, ${city}, ${state} ${pinCode}`;
+    const fullAddress = `${addressLine1}${addr2Input.value.trim() ? ', ' + addr2Input.value.trim() : ''}, ${city}, ${district}, ${state}, ${country} - ${pinCode}`;
     const generatedClaimId = 'CLM-2026-' + Math.floor(10000 + Math.random() * 90000);
 
     const claimData = {
       spinId: currentSpinState.spinId,
-      name: userName,
-      email: rawEmail || 'claim@luxespin.com',
-      phone: rawPhone || '+1 (555) 000-0000',
+      name,
+      email,
+      phone,
       addressLine1,
-      addressLine2: document.getElementById('claimAddr2').value.trim(),
+      addressLine2: addr2Input.value.trim(),
       city,
-      district: document.getElementById('claimDistrict').value.trim() || city,
+      district,
       state,
-      country: document.getElementById('claimCountry').value.trim() || 'United States',
+      country,
       pinCode,
       occupation: document.getElementById('claimOccupation').value.trim(),
-      age: document.getElementById('claimAge').value || 25,
-      gender: document.getElementById('claimGender').value || 'Male',
+      age: parseInt(age, 10),
+      gender,
       preferredDeliveryTime: document.getElementById('claimDeliveryTime').value,
       additionalNotes: document.getElementById('claimNotes').value.trim(),
       prize: prizeName,
-      agreedToTerms: document.getElementById('claimTerms').checked
+      agreedToTerms
     };
 
-    // 1. INSTANTLY open Success Modal Popup automatically!
+    // 1. Success validation -> show modal & generate invoice data
     claimForm.reset();
-    showSuccessModal(userName, prizeName, generatedClaimId, fullAddress, claimData.email, claimData.phone);
+    showSuccessModal(name, prizeName, generatedClaimId, fullAddress, email, phone);
 
-    // 2. Save claim details to MongoDB Atlas in background
+    // 2. Save claim details to DB
     fetch('/api/claims/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -59,6 +59,10 @@ exports.submitClaim = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please complete all required fields.' });
     }
 
+    if (!/^[0-9]{10}$/.test(phone)) {
+      return res.status(400).json({ success: false, message: 'Phone number must be exactly 10 digits.' });
+    }
+
     const { ip, browser, os, deviceType } = parseDeviceInfo(req);
     const claimId = generateClaimId();
     const submissionTime = new Date();
