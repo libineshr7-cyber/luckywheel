@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static frontend
+// Serve static frontend from public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Public APIs
@@ -41,15 +41,14 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Fallback route
+// Fallback route for index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
+// Bind to 0.0.0.0 host required by Render cloud deployment
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`====================================================`);
-  console.log(`🚀 Daily Lucky Spin Server running on http://localhost:${PORT}`);
-  console.log(`🏠 Homepage: http://localhost:${PORT}`);
-  console.log(`🔐 Admin Panel: http://localhost:${PORT}/admin`);
+  console.log(`🚀 Daily Lucky Spin Server running on port ${PORT}`);
   console.log(`====================================================`);
 });
