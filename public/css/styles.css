@@ -384,6 +384,30 @@ body {
   margin-top: -16px;
 }
 
+/* Celebration Backdrop & Falling Balloons Canvas */
+.celebration-backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(16, 0, 2, 0.4) 0%, rgba(0, 0, 0, 0.82) 100%),
+              url('/assets/celebration-bg.jpg') center/cover no-repeat;
+  z-index: 85;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.celebration-backdrop.active {
+  opacity: 1;
+}
+
+.celebration-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  display: none;
+}
+
 /* Modals & Backdrop */
 .modal-backdrop {
   position: fixed;

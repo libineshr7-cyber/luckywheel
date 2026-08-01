@@ -110,7 +110,221 @@
     return '';
   }
 
+  // Celebration Animation Class (Falling balloons, golden ribbons, confetti)
+  class CelebrationAnimation {
+    constructor(canvasId) {
+      this.canvas = document.getElementById(canvasId);
+      if (!this.canvas) return;
+      this.ctx = this.canvas.getContext('2d');
+      this.particles = [];
+      this.balloons = [];
+      this.ribbons = [];
+      this.isRunning = false;
+      this.animId = null;
+
+      this.colors = ['#FF1744', '#FFD700', '#00E5FF', '#D500F9', '#FF9100', '#76FF03', '#FF4081'];
+
+      window.addEventListener('resize', () => {
+        if (this.isRunning) this.resize();
+      });
+    }
+
+    resize() {
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
+      this.canvas.width = this.width * (window.devicePixelRatio || 1);
+      this.canvas.height = this.height * (window.devicePixelRatio || 1);
+      this.ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    }
+
+    start() {
+      if (!this.canvas) return;
+      this.resize();
+      this.canvas.style.display = 'block';
+      this.isRunning = true;
+
+      // 28 Glossy Falling Balloons
+      this.balloons = [];
+      for (let i = 0; i < 28; i++) {
+        this.balloons.push({
+          x: Math.random() * this.width,
+          y: -120 - Math.random() * this.height,
+          radius: 22 + Math.random() * 20,
+          color: this.colors[Math.floor(Math.random() * this.colors.length)],
+          vy: 1.4 + Math.random() * 2.2,
+          vx: (Math.random() - 0.5) * 1.4,
+          swingSpeed: 0.02 + Math.random() * 0.03,
+          swingAngle: Math.random() * Math.PI * 2,
+          stringLength: 45 + Math.random() * 30
+        });
+      }
+
+      // 130 Tumbling Confetti Particles
+      this.particles = [];
+      for (let i = 0; i < 130; i++) {
+        this.particles.push({
+          x: Math.random() * this.width,
+          y: -60 - Math.random() * this.height,
+          size: 6 + Math.random() * 9,
+          color: this.colors[Math.floor(Math.random() * this.colors.length)],
+          vy: 2.5 + Math.random() * 4,
+          vx: (Math.random() - 0.5) * 2.2,
+          rot: Math.random() * Math.PI * 2,
+          vRot: (Math.random() - 0.5) * 0.25,
+          shape: Math.random() > 0.4 ? 'rect' : 'circle'
+        });
+      }
+
+      // 16 Falling Golden Ribbons
+      this.ribbons = [];
+      for (let i = 0; i < 16; i++) {
+        this.ribbons.push({
+          x: Math.random() * this.width,
+          y: -160 - Math.random() * this.height,
+          length: 90 + Math.random() * 70,
+          width: 3 + Math.random() * 3,
+          vy: 2.2 + Math.random() * 3,
+          waveFreq: 0.03 + Math.random() * 0.03,
+          waveAmp: 16 + Math.random() * 16,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+
+      this.animate();
+    }
+
+    stop() {
+      this.isRunning = false;
+      if (this.animId) cancelAnimationFrame(this.animId);
+      if (this.ctx) this.ctx.clearRect(0, 0, this.width, this.height);
+      if (this.canvas) this.canvas.style.display = 'none';
+    }
+
+    animate() {
+      if (!this.isRunning) return;
+
+      const ctx = this.ctx;
+      ctx.clearRect(0, 0, this.width, this.height);
+
+      // 1. Draw Balloons
+      for (let b of this.balloons) {
+        b.swingAngle += b.swingSpeed;
+        b.y += b.vy;
+        b.x += b.vx + Math.sin(b.swingAngle) * 0.9;
+
+        if (b.y - b.radius > this.height + 100) {
+          b.y = -100;
+          b.x = Math.random() * this.width;
+        }
+
+        ctx.save();
+        ctx.translate(b.x, b.y);
+
+        // String
+        ctx.beginPath();
+        ctx.moveTo(0, b.radius);
+        ctx.bezierCurveTo(
+          Math.sin(b.swingAngle) * 14, b.radius + b.stringLength * 0.3,
+          -Math.sin(b.swingAngle) * 14, b.radius + b.stringLength * 0.7,
+          0, b.radius + b.stringLength
+        );
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Balloon Body
+        const bGrad = ctx.createRadialGradient(-b.radius * 0.3, -b.radius * 0.3, b.radius * 0.1, 0, 0, b.radius);
+        bGrad.addColorStop(0, '#FFFFFF');
+        bGrad.addColorStop(0.3, b.color);
+        bGrad.addColorStop(1, '#000000');
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, b.radius * 0.85, b.radius, 0, 0, 2 * Math.PI);
+        ctx.fillStyle = bGrad;
+        ctx.fill();
+
+        // Specular Shine
+        ctx.beginPath();
+        ctx.ellipse(-b.radius * 0.3, -b.radius * 0.35, b.radius * 0.25, b.radius * 0.15, -Math.PI / 4, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fill();
+
+        // Knot
+        ctx.beginPath();
+        ctx.moveTo(-3, b.radius);
+        ctx.lineTo(3, b.radius);
+        ctx.lineTo(5, b.radius + 4);
+        ctx.lineTo(-5, b.radius + 4);
+        ctx.closePath();
+        ctx.fillStyle = b.color;
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // 2. Draw Golden Ribbons
+      for (let r of this.ribbons) {
+        r.y += r.vy;
+        r.phase += r.waveFreq;
+
+        if (r.y > this.height + r.length) {
+          r.y = -r.length - 50;
+          r.x = Math.random() * this.width;
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        const points = 20;
+        for (let i = 0; i <= points; i++) {
+          const py = r.y + (i / points) * r.length;
+          const px = r.x + Math.sin(r.phase + (i / points) * Math.PI * 3) * r.waveAmp;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = r.width;
+        ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
+        ctx.shadowBlur = 6;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 3. Draw Confetti
+      for (let p of this.particles) {
+        p.y += p.vy;
+        p.x += p.vx + Math.sin(p.y * 0.02) * 1.2;
+        p.rot += p.vRot;
+
+        if (p.y > this.height + 20) {
+          p.y = -20;
+          p.x = Math.random() * this.width;
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+
+        if (p.shape === 'rect') {
+          ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size / 2, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      this.animId = requestAnimationFrame(() => this.animate());
+    }
+  }
+
+  let celebrationFx = null;
+
   function initWheel() {
+    celebrationFx = new CelebrationAnimation('celebrationCanvas');
+    window.celebrationFx = celebrationFx;
+
     wheelInstance = new RealisticWheel('prizeWheelCanvas', {
       prizes: [
         "iPhone 17 Pro Max",
@@ -134,6 +348,11 @@
         spinBtn.classList.remove('loading');
         currentSpinState.wonPrize = prizeName;
         
+        // Trigger live celebration background & falling balloons
+        const celebrationBackdrop = document.getElementById('celebrationBackdrop');
+        if (celebrationBackdrop) celebrationBackdrop.classList.add('active');
+        if (celebrationFx) celebrationFx.start();
+
         setTimeout(() => {
           showWinModal(prizeName);
         }, 300);
