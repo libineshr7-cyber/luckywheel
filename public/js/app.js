@@ -487,12 +487,26 @@
     winModal.classList.add('active');
   }
 
-  function hideWinModal() {
+  function stopCelebration() {
+    const celebrationBackdrop = document.getElementById('celebrationBackdrop');
+    if (celebrationBackdrop) celebrationBackdrop.classList.remove('active');
+    if (celebrationFx) celebrationFx.stop();
+  }
+
+  function returnToHomePage() {
     winModal.classList.remove('active');
+    claimModal.classList.remove('active');
+    successModal.classList.remove('active');
+    stopCelebration();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function hideWinModal() {
+    returnToHomePage();
   }
 
   function showClaimModal() {
-    hideWinModal();
+    winModal.classList.remove('active');
     const prizeName = currentSpinState.wonPrize || 'iPhone 17 Pro Max';
     claimFormPrizeName.textContent = prizeName;
     claimPrizeImageContainer.innerHTML = getPrizeSvg(prizeName);
@@ -500,11 +514,11 @@
   }
 
   function hideClaimModal() {
-    claimModal.classList.remove('active');
+    returnToHomePage();
   }
 
   function showSuccessModal(userName, prizeName, claimId, addressStr, email, phone) {
-    hideClaimModal();
+    claimModal.classList.remove('active');
     successUserName.textContent = userName;
     summaryName.textContent = userName;
     summaryPrize.textContent = prizeName;
@@ -525,7 +539,7 @@
   }
 
   function hideSuccessModal() {
-    successModal.classList.remove('active');
+    returnToHomePage();
   }
 
   // Restrict Phone Number input to numbers only and max 10 digits
@@ -753,7 +767,7 @@
 
   [winModal, claimModal, successModal].forEach(modal => {
     modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.classList.remove('active');
+      if (e.target === modal) returnToHomePage();
     });
   });
 
