@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Lucky Spin | Premium Rewards</title>
+  <meta name="description" content="Spin once every 24 hours for an exclusive chance to receive premium rewards. Clean, minimal, and secure.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>">
+  <style>
+    .prize-img-container {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+    }
+    .prize-photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .prize-img-container:hover .prize-photo-img {
+      transform: scale(1.06);
+    }
+    .claim-prize-banner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+    .claim-prize-img {
+      width: 72px;
+      height: 72px;
+      flex-shrink: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      background: #ffffff;
+    }
+    .claim-prize-info h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .claim-prize-info p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    /* Success Modal Styles */
+    .success-check-wrapper {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #059669;
+      box-shadow: 0 10px 25px rgba(5, 150, 105, 0.15);
+    }
+    .success-summary-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin: 20px 0 24px;
+      text-align: left;
+      font-size: 14px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+    .summary-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .summary-val {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="app-header">
+    <a href="/" class="brand-logo" id="headerLogo">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="brand-title">LuxeSpin</span>
+          <span class="brand-tag">Verified</span>
+        </div>
+      </div>
+    </a>
+    <div class="header-right">
+      <!-- Admin link hidden from public view -->
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    
+    <!-- Hero Header -->
+    <section class="hero-section">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Daily Rewards Program Active
+      </div>
+      <h1 class="hero-title">Daily Lucky Spin</h1>
+      <p class="hero-subtitle">Spin once every 24 hours for a chance to receive premium rewards.</p>
+    </section>
+
+    <!-- Wheel Stage -->
+    <section class="wheel-stage">
+      
+      <!-- Metallic Pointer -->
+      <div class="wheel-pointer-container" id="wheelPointer">
+        <svg class="wheel-pointer-svg" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="metallicPointerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFFFFF" />
+              <stop offset="40%" stop-color="#94A3B8" />
+              <stop offset="70%" stop-color="#475569" />
+              <stop offset="100%" stop-color="#1E293B" />
+            </linearGradient>
+            <filter id="pointerShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.25"/>
+            </filter>
+          </defs>
+          <path d="M22 46 L38 8 C40 4 36 0 30 0 L14 0 C8 0 4 4 6 8 Z" fill="url(#metallicPointerGrad)" filter="url(#pointerShadow)" stroke="#FFFFFF" stroke-width="1.5"/>
+          <circle cx="22" cy="10" r="4" fill="#2563EB" />
+        </svg>
+      </div>
+
+      <!-- Wheel Card -->
+      <div class="wheel-card">
+        <canvas id="prizeWheelCanvas" class="wheel-canvas"></canvas>
+      </div>
+
+    </section>
+
+    <!-- Spin Button & Cooldown Timer Section -->
+    <section class="spin-action-container">
+      <button id="spinBtn" class="btn-spin">
+        <span class="btn-loader"></span>
+        <span class="btn-text">Spin Wheel</span>
+      </button>
+
+      <!-- Cooldown Box -->
+      <div id="cooldownCard" class="cooldown-card" style="display: none;">
+        <div class="cooldown-label">Your next spin will be available in</div>
+        <div class="cooldown-timer-grid">
+          <div class="timer-segment">
+            <span class="timer-val" id="timerHours">23</span>
+            <span class="timer-unit">Hours</span>
+          </div>
+          <span class="timer-colon">:</span>
+          <div class="timer-segment">
+            <span class="timer-val" id="timerMinutes">59</span>
+            <span class="timer-unit">Minutes</span>
+          </div>
+          <span class="timer-colon">:</span>
+          <div class="timer-segment">
+            <span class="timer-val" id="timerSeconds">59</span>
+            <span class="timer-unit">Seconds</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Win Modal Popup -->
+  <div id="winModal" class="modal-backdrop">
+    <div class="modal-card win-popup-body">
+      <button class="modal-close-btn" id="winModalCloseBtn" aria-label="Close modal">&times;</button>
+      
+      <div class="prize-img-container" id="winPrizeImageContainer"></div>
+
+      <div class="win-congrats-tag">Congratulations!</div>
+      <h2 class="win-prize-title" id="winPrizeName">iPhone 17 Pro Max</h2>
+      <p class="win-prize-subtext">You have successfully won a premium reward in today's lucky spin.</p>
+
+      <div class="win-actions">
+        <button id="claimRewardBtn" class="btn-primary">Claim Reward</button>
+        <button id="closeWinPopupBtn" class="btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claim Form Modal -->
+  <div id="claimModal" class="modal-backdrop">
+    <div class="modal-card claim-modal-card">
+      <button class="modal-close-btn" id="claimModalCloseBtn" aria-label="Close modal">&times;</button>
+      
+      <div class="form-header">
+        <h2 class="form-title">Claim Reward</h2>
+        <p class="form-subtitle">Please enter your verified delivery details to receive your prize.</p>
+      </div>
+
+      <!-- Claim Prize Visual Banner -->
+      <div class="claim-prize-banner">
+        <div class="claim-prize-img" id="claimPrizeImageContainer"></div>
+        <div class="claim-prize-info">
+          <h3 id="claimFormPrizeName">Prize Reward</h3>
+          <p>Verified Daily Lucky Spin Reward</p>
+        </div>
+      </div>
+
+      <form id="claimForm" onsubmit="return false;">
+        <div class="form-grid">
+
+          <div class="form-group full-width">
+            <label class="form-label" for="claimName">Full Name *</label>
+            <input type="text" id="claimName" class="form-input" placeholder="e.g. Alexander Wright">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimEmail">Email Address *</label>
+            <input type="text" id="claimEmail" class="form-input" placeholder="alexander@example.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimPhone">Phone Number *</label>
+            <input type="text" id="claimPhone" class="form-input" placeholder="+1 (555) 000-0000">
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="claimAddr1">Address Line 1 *</label>
+            <input type="text" id="claimAddr1" class="form-input" placeholder="Street Address, P.O. Box, Company">
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="claimAddr2">Address Line 2</label>
+            <input type="text" id="claimAddr2" class="form-input" placeholder="Apartment, Suite, Unit, Building, Floor">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimCity">City *</label>
+            <input type="text" id="claimCity" class="form-input" placeholder="City">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimDistrict">District *</label>
+            <input type="text" id="claimDistrict" class="form-input" placeholder="District">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimState">State / Province *</label>
+            <input type="text" id="claimState" class="form-input" placeholder="State">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimCountry">Country *</label>
+            <input type="text" id="claimCountry" class="form-input" placeholder="Country">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimPin">PIN / Postal Code *</label>
+            <input type="text" id="claimPin" class="form-input" placeholder="PIN Code">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimOccupation">Occupation</label>
+            <input type="text" id="claimOccupation" class="form-input" placeholder="Software Engineer, Executive...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimAge">Age *</label>
+            <input type="text" id="claimAge" class="form-input" placeholder="25">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimGender">Gender *</label>
+            <select id="claimGender" class="form-select">
+              <option value="Male" selected>Male</option>
+              <option value="Female">Female</option>
+              <option value="Non-Binary">Non-Binary</option>
+              <option value="Prefer Not to Say">Prefer Not to Say</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="claimDeliveryTime">Preferred Delivery Time</label>
+            <select id="claimDeliveryTime" class="form-select">
+              <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+              <option value="Afternoon (12 PM - 5 PM)">Afternoon (12 PM - 5 PM)</option>
+              <option value="Evening (5 PM - 9 PM)">Evening (5 PM - 9 PM)</option>
+              <option value="Anytime (9 AM - 9 PM)" selected>Anytime (9 AM - 9 PM)</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="claimNotes">Additional Notes</label>
+            <textarea id="claimNotes" class="form-textarea" placeholder="Special delivery instructions or gate access code..."></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="checkbox-group">
+              <input type="checkbox" id="claimTerms" class="checkbox-input" checked>
+              <span class="checkbox-label">I agree to the <a href="#" id="termsLink">Terms and Conditions</a>.</span>
+            </label>
+          </div>
+
+        </div>
+
+        <button type="button" id="submitClaimBtn" class="form-submit-btn">Submit Claim Request</button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Grand Success Modal Popup -->
+  <div id="successModal" class="modal-backdrop">
+    <div class="modal-card win-popup-body" style="max-width: 560px;">
+      <button class="modal-close-btn" id="successModalCloseBtn" aria-label="Close modal">&times;</button>
+      
+      <div class="success-check-wrapper">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      <div class="win-congrats-tag" style="color: #059669;">Claim Request Confirmed!</div>
+      <h2 class="win-prize-title" style="font-size: 26px;">Reward Dispatched!</h2>
+      <p class="win-prize-subtext">Congratulations, <strong id="successUserName" style="color: var(--text-primary);">User</strong>! Your reward has been successfully registered and is being prepared for dispatch.</p>
+
+      <div class="success-summary-box">
+        <div class="summary-row">
+          <span class="summary-label">Winner Name</span>
+          <span class="summary-val" id="summaryName">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Reward Won</span>
+          <span class="summary-val" id="summaryPrize">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Claim ID</span>
+          <span class="summary-val" id="summaryClaimId" style="color: var(--accent-blue); font-family: monospace;">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Delivery Address</span>
+          <span class="summary-val" id="summaryAddress" style="text-align: right; max-width: 60%;">-</span>
+        </div>
+      </div>
+
+      <!-- Actions: Download Invoice + Done -->
+      <div style="display: flex; gap: 12px; margin-top: 20px;">
+        <button id="downloadInvoiceBtn" class="btn-secondary" style="flex: 1.2; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download Invoice
+        </button>
+        <button id="doneSuccessBtn" class="btn-primary" style="flex: 1;">Done</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>&copy; 2026 LuxeSpin Daily Rewards. All rights reserved. Built with Apple & Stripe minimalist aesthetics.</p>
+  </footer>
+
+  <script src="/js/prizeImages.js"></script>
+  <script src="/js/wheel.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

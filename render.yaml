@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: daily-lucky-spin
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb+srv://libineshr_db_user:49XHw4Joog8hEEoB@cluster0.msafzi2.mongodb.net/Spinwheel?retryWrites=true&w=majority
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        value: admin123

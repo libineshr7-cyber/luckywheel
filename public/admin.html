@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | LuxeSpin Management</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .admin-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      width: 100%;
+    }
+
+    /* Auth Screen */
+    .admin-auth-card {
+      max-width: 400px;
+      margin: 80px auto;
+      padding: 36px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      text-align: center;
+    }
+
+    .auth-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .auth-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .dashboard-title-group h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .dashboard-title-group p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .dashboard-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-export {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-export:hover {
+      background: var(--bg-secondary);
+      border-color: #cbd5e1;
+    }
+
+    /* Stats Grid Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-subtle);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    /* Filters Bar */
+    .filters-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* Data Table */
+    .table-container {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow-x: auto;
+    }
+
+    .claims-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .claims-table th {
+      background: var(--bg-secondary);
+      padding: 14px 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    .claims-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .claims-table tr:hover td {
+      background: var(--bg-secondary);
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-completed { background: #d1fae5; color: #065f46; }
+    .badge-processing { background: #e0f2fe; color: #075985; }
+    .badge-cancelled { background: #fee2e2; color: #991b1b; }
+
+    /* Action Buttons */
+    .btn-action-icon {
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-action-icon:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .btn-action-icon.btn-danger:hover {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+
+    .btn-action-icon.btn-success:hover {
+      background: #d1fae5;
+      color: #059669;
+      border-color: #6ee7b7;
+    }
+
+    /* User Details Modal */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+
+    .detail-item {
+      padding: 10px 14px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+    }
+
+    .detail-item strong {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .filters-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .filters-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="/" class="brand-logo">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      </div>
+      <span class="brand-title">LuxeSpin Admin</span>
+    </a>
+    <div class="header-right">
+      <a href="/" class="admin-nav-link">&larr; Back to App</a>
+      <button id="adminLogoutBtn" class="admin-nav-link" style="display: none;">Logout</button>
+    </div>
+  </header>
+
+  <!-- Login Form Container -->
+  <div id="adminLoginSection">
+    <div class="admin-auth-card">
+      <h2 class="auth-title">Admin Sign In</h2>
+      <p class="auth-subtitle">Enter administrative credentials to access claim records.</p>
+      
+      <form id="adminLoginForm">
+        <div class="form-group" style="margin-bottom: 14px; text-align: left;">
+          <label class="form-label">Username</label>
+          <input type="text" id="adminUser" class="form-input" value="admin" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+          <label class="form-label">Password</label>
+          <input type="password" id="adminPass" class="form-input" value="admin123" required>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard Section (Hidden until auth) -->
+  <div id="adminDashboardSection" class="admin-container" style="display: none;">
+    
+    <div class="dashboard-header">
+      <div class="dashboard-title-group">
+        <h1>Claims & Spin Management</h1>
+        <p>Real-time analytics and user reward claims control panel.</p>
+      </div>
+      <div class="dashboard-actions">
+        <a href="/api/admin/export/csv" target="_blank" class="btn-export">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Export CSV
+        </a>
+        <a href="/api/admin/export/excel" target="_blank" class="btn-export">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          Export Excel
+        </a>
+      </div>
+    </div>
+
+    <!-- Stat Grid Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Spins</div>
+        <div class="stat-value" id="statTotalSpins">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Today's Spins</div>
+        <div class="stat-value" id="statTodaySpins">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Claims</div>
+        <div class="stat-value" id="statTotalClaims">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending Claims</div>
+        <div class="stat-value" id="statPendingClaims" style="color: #d97706;">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completed Claims</div>
+        <div class="stat-value" id="statCompletedClaims" style="color: #059669;">0</div>
+      </div>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="filters-card">
+      <div class="filters-grid">
+        <input type="text" id="filterSearch" class="form-input" placeholder="Search by Name, Email, Phone, Claim ID, City...">
+        
+        <select id="filterPrize" class="form-select">
+          <option value="ALL">All Prizes</option>
+          <option value="iPhone 17 Pro Max">iPhone 17 Pro Max</option>
+          <option value="Samsung Galaxy S25 Ultra">Samsung Galaxy S25 Ultra</option>
+          <option value="MacBook Pro">MacBook Pro</option>
+          <option value="Apple Watch Ultra">Apple Watch Ultra</option>
+          <option value="PlayStation 5 Pro">PlayStation 5 Pro</option>
+          <option value="BMW M4">BMW M4</option>
+          <option value="Mercedes G-Class">Mercedes G-Class</option>
+          <option value="Dubai Luxury Trip">Dubai Luxury Trip</option>
+          <option value="₹10,00,000 Cash Reward">₹10,00,000 Cash Reward</option>
+          <option value="Rolex Watch">Rolex Watch</option>
+          <option value="Apple Vision Pro">Apple Vision Pro</option>
+          <option value="Tesla Model 3">Tesla Model 3</option>
+        </select>
+
+        <select id="filterStatus" class="form-select">
+          <option value="ALL">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed</option>
+          <option value="Processing">Processing</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+
+        <input type="date" id="filterStartDate" class="form-input" title="Start Date">
+        <input type="date" id="filterEndDate" class="form-input" title="End Date">
+      </div>
+    </div>
+
+    <!-- Claims Table -->
+    <div class="table-container">
+      <table class="claims-table">
+        <thead>
+          <tr>
+            <th>Claim ID</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Prize</th>
+            <th>Submission Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="claimsTableBody">
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 32px; color: var(--text-muted);">Loading claims data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Detailed View Modal -->
+  <div id="claimDetailModal" class="modal-backdrop">
+    <div class="modal-card claim-modal-card">
+      <button class="modal-close-btn" id="closeDetailModalBtn">&times;</button>
+      <h2 class="form-title" id="detailClaimId">Claim Details</h2>
+      <p class="form-subtitle">Complete user information and delivery metadata.</p>
+      
+      <div id="detailContent" class="detail-grid"></div>
+
+      <div style="margin-top: 24px; display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="markCompleteBtn" class="btn-primary" style="max-width: 180px;">Mark Completed</button>
+        <button id="deleteClaimBtn" class="btn-secondary" style="color: #dc2626;">Delete Record</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
