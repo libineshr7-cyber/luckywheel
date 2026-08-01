@@ -7,6 +7,7 @@
   const timerHours = document.getElementById('timerHours');
   const timerMinutes = document.getElementById('timerMinutes');
   const timerSeconds = document.getElementById('timerSeconds');
+  const resetTimerBtn = document.getElementById('resetTimerBtn');
   const wheelPointer = document.getElementById('wheelPointer');
 
   const winModal = document.getElementById('winModal');
@@ -60,9 +61,7 @@
     // Secret Test Reset (Shift + Alt + R)
     if (e.shiftKey && e.altKey && (e.key === 'R' || e.key === 'r' || e.code === 'KeyR')) {
       e.preventDefault();
-      localStorage.clear();
-      enableSpinButton();
-      showToast('Test Cooldown Cleared! You can spin again now.', 'success');
+      resetSpinCooldown();
     }
   });
 
@@ -80,7 +79,16 @@
     }
   }
 
-  const userFingerprint = getBrowserFingerprint();
+  let userFingerprint = getBrowserFingerprint();
+
+  function resetSpinCooldown() {
+    localStorage.removeItem('luxespin_device_id');
+    const newFp = 'fp_dev_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
+    localStorage.setItem('luxespin_device_id', newFp);
+    userFingerprint = newFp;
+    enableSpinButton();
+    showToast('Spin Timer Reset! You can spin again now.', 'success');
+  }
 
   function showToast(message, type = 'info') {
     const toast = document.createElement('div');
@@ -671,6 +679,7 @@
 
   // Event Listeners
   spinBtn.addEventListener('click', handleSpinClick);
+  if (resetTimerBtn) resetTimerBtn.addEventListener('click', resetSpinCooldown);
   claimRewardBtn.addEventListener('click', showClaimModal);
   closeWinPopupBtn.addEventListener('click', hideWinModal);
   winModalCloseBtn.addEventListener('click', hideWinModal);
