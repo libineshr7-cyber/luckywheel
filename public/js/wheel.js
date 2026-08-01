@@ -27,29 +27,25 @@ class RealisticWheel {
     this.isSpinning = false;
     
     this.audioCtx = null;
-
-    this.colors = [
-      { bg: '#FFFFFF', text: '#0F172A' },
-      { bg: '#F8FAFC', text: '#0F172A' },
-      { bg: '#FFFBF5', text: '#0F172A' },
-      { bg: '#F1F5F9', text: '#0F172A' },
-      { bg: '#FFFFFF', text: '#0F172A' },
-      { bg: '#F8FAFC', text: '#0F172A' },
-      { bg: '#FFFBF5', text: '#0F172A' },
-      { bg: '#F1F5F9', text: '#0F172A' },
-      { bg: '#FFFFFF', text: '#0F172A' },
-      { bg: '#F8FAFC', text: '#0F172A' },
-      { bg: '#FFFBF5', text: '#0F172A' },
-      { bg: '#F1F5F9', text: '#0F172A' }
-    ];
+    this.bulbTimer = null;
 
     this.initCanvasSize();
     this.draw();
+    this.startBulbAnimation();
 
     window.addEventListener('resize', () => {
       this.initCanvasSize();
       this.draw();
     });
+  }
+
+  startBulbAnimation() {
+    if (this.bulbTimer) clearInterval(this.bulbTimer);
+    this.bulbTimer = setInterval(() => {
+      if (!this.isSpinning) {
+        this.draw();
+      }
+    }, 450);
   }
 
   playTickSound() {
@@ -65,9 +61,9 @@ class RealisticWheel {
         const osc = this.audioCtx.createOscillator();
         const gain = this.audioCtx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(480 + Math.random() * 80, this.audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(120, this.audioCtx.currentTime + 0.025);
-        gain.gain.setValueAtTime(0.12, this.audioCtx.currentTime);
+        osc.frequency.setValueAtTime(520 + Math.random() * 90, this.audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(140, this.audioCtx.currentTime + 0.025);
+        gain.gain.setValueAtTime(0.15, this.audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.025);
         osc.connect(gain);
         gain.connect(this.audioCtx.destination);
@@ -90,7 +86,6 @@ class RealisticWheel {
     this.size = size;
     this.centerX = (size * dpr) / 2;
     this.centerY = (size * dpr) / 2;
-    this.radius = (size * dpr) / 2 - 18 * dpr;
     this.dpr = dpr;
   }
 
@@ -101,115 +96,233 @@ class RealisticWheel {
 
     ctx.save();
     ctx.translate(this.centerX, this.centerY);
-    ctx.rotate(this.currentAngle);
 
-    // 1. Bezel Outer Metallic Rim
-    const outerRimGradient = ctx.createRadialGradient(0, 0, this.radius - 10 * dpr, 0, 0, this.radius + 14 * dpr);
-    outerRimGradient.addColorStop(0, '#E2E8F0');
-    outerRimGradient.addColorStop(0.3, '#FFFFFF');
-    outerRimGradient.addColorStop(0.7, '#94A3B8');
-    outerRimGradient.addColorStop(1, '#64748B');
+    const totalRadius = (this.size * dpr) / 2 - 6 * dpr;
+    const rimWidth = 36 * dpr;
+    const wheelRadius = totalRadius - rimWidth;
+
+    // 1. Gold Outer Metallic Gradient
+    const goldGrad = ctx.createLinearGradient(-totalRadius, -totalRadius, totalRadius, totalRadius);
+    goldGrad.addColorStop(0, '#FFE875');
+    goldGrad.addColorStop(0.2, '#F5AF19');
+    goldGrad.addColorStop(0.4, '#FFF5B8');
+    goldGrad.addColorStop(0.7, '#E65100');
+    goldGrad.addColorStop(0.85, '#FFD700');
+    goldGrad.addColorStop(1, '#996E14');
+
+    // Outer Bezel Rim Base (Gold)
+    ctx.beginPath();
+    ctx.arc(0, 0, totalRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = goldGrad;
+    ctx.fill();
+
+    // Dark Red Bezel Center Ring
+    const redBezelGrad = ctx.createRadialGradient(0, 0, wheelRadius, 0, 0, totalRadius - 3 * dpr);
+    redBezelGrad.addColorStop(0, '#7A0002');
+    redBezelGrad.addColorStop(0.5, '#A80004');
+    redBezelGrad.addColorStop(1, '#4A0001');
 
     ctx.beginPath();
-    ctx.arc(0, 0, this.radius + 10 * dpr, 0, 2 * Math.PI);
-    ctx.fillStyle = outerRimGradient;
+    ctx.arc(0, 0, totalRadius - 3 * dpr, 0, 2 * Math.PI);
+    ctx.fillStyle = redBezelGrad;
+    ctx.fill();
+
+    // Inner Bezel Gold Ring
+    ctx.beginPath();
+    ctx.arc(0, 0, wheelRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = goldGrad;
     ctx.fill();
 
     ctx.beginPath();
-    ctx.arc(0, 0, this.radius, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#94A3B8';
-    ctx.lineWidth = 2 * dpr;
-    ctx.stroke();
+    ctx.arc(0, 0, wheelRadius - 2.5 * dpr, 0, 2 * Math.PI);
+    ctx.fillStyle = '#1A0001';
+    ctx.fill();
 
-    // 2. Segments
+    // 2. Casino Light Bulbs on Bezel
+    const bulbCount = 24;
+    const bulbRadius = 6.5 * dpr;
+    const bulbDist = totalRadius - rimWidth / 2;
+
+    const timeIndex = Math.floor(Date.now() / (this.isSpinning ? 90 : 450));
+
+    for (let b = 0; b < bulbCount; b++) {
+      const bulbAngle = (b * 2 * Math.PI) / bulbCount;
+      const bx = Math.cos(bulbAngle) * bulbDist;
+      const by = Math.sin(bulbAngle) * bulbDist;
+
+      // Socket ring
+      ctx.beginPath();
+      ctx.arc(bx, by, bulbRadius + 1.8 * dpr, 0, 2 * Math.PI);
+      ctx.fillStyle = goldGrad;
+      ctx.fill();
+
+      const isLit = (timeIndex + b) % 2 === 0;
+
+      if (isLit) {
+        // Glowing bulb aura
+        ctx.save();
+        ctx.shadowColor = '#FFEA00';
+        ctx.shadowBlur = 14 * dpr;
+        ctx.beginPath();
+        ctx.arc(bx, by, bulbRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fill();
+        ctx.restore();
+
+        // Bulb center gradient
+        const litGrad = ctx.createRadialGradient(bx - 2 * dpr, by - 2 * dpr, 0, bx, by, bulbRadius);
+        litGrad.addColorStop(0, '#FFFFFF');
+        litGrad.addColorStop(0.3, '#FFF700');
+        litGrad.addColorStop(0.75, '#FF8C00');
+        litGrad.addColorStop(1, '#E65100');
+
+        ctx.beginPath();
+        ctx.arc(bx, by, bulbRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = litGrad;
+        ctx.fill();
+      } else {
+        // Dimmed bulb
+        const dimGrad = ctx.createRadialGradient(bx - 1.5 * dpr, by - 1.5 * dpr, 0, bx, by, bulbRadius);
+        dimGrad.addColorStop(0, '#FFD700');
+        dimGrad.addColorStop(0.6, '#996E14');
+        dimGrad.addColorStop(1, '#4A3000');
+
+        ctx.beginPath();
+        ctx.arc(bx, by, bulbRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = dimGrad;
+        ctx.fill();
+      }
+    }
+
+    // 3. ROTATING SEGMENTS
+    ctx.save();
+    ctx.rotate(this.currentAngle);
+
+    const innerRadius = wheelRadius - 2.5 * dpr;
+
     for (let i = 0; i < this.segmentCount; i++) {
       const startAngle = i * this.segmentAngle;
       const endAngle = startAngle + this.segmentAngle;
-      const color = this.colors[i % this.colors.length];
+      const isYellowSegment = i % 2 === 0;
 
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.arc(0, 0, this.radius, startAngle, endAngle);
+      ctx.arc(0, 0, innerRadius, startAngle, endAngle);
       ctx.closePath();
-      ctx.fillStyle = color.bg;
+
+      const segGrad = ctx.createRadialGradient(0, 0, 15 * dpr, 0, 0, innerRadius);
+      if (isYellowSegment) {
+        // Bright Gold/Yellow Segment
+        segGrad.addColorStop(0, '#FFF59D');
+        segGrad.addColorStop(0.35, '#FFC107');
+        segGrad.addColorStop(0.85, '#FF9800');
+        segGrad.addColorStop(1, '#F57C00');
+      } else {
+        // Deep Rich Red Segment
+        segGrad.addColorStop(0, '#FF3D00');
+        segGrad.addColorStop(0.35, '#D50000');
+        segGrad.addColorStop(0.85, '#990000');
+        segGrad.addColorStop(1, '#5C0000');
+      }
+
+      ctx.fillStyle = segGrad;
       ctx.fill();
 
-      ctx.strokeStyle = '#CBD5E1';
-      ctx.lineWidth = 1.5 * dpr;
+      // Divider Lines (Gold Metallic)
+      ctx.strokeStyle = goldGrad;
+      ctx.lineWidth = 2.2 * dpr;
       ctx.stroke();
 
+      // Text & Icon Rendering
       ctx.save();
       const midAngle = startAngle + this.segmentAngle / 2;
       ctx.rotate(midAngle);
 
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = color.text;
-      ctx.font = `600 ${Math.max(11, Math.floor(13 * dpr))}px Inter, sans-serif`;
+
+      const fontSize = Math.max(12, Math.floor(14 * dpr));
+      ctx.font = `900 ${fontSize}px Inter, "Segoe UI", sans-serif`;
 
       const prizeName = this.prizes[i];
       let displayTitle = prizeName;
-      if (displayTitle.length > 18) {
-        displayTitle = displayTitle.substring(0, 16) + '...';
+      if (displayTitle.length > 17) {
+        displayTitle = displayTitle.substring(0, 15) + '...';
       }
 
-      ctx.fillText(displayTitle, this.radius - 30 * dpr, 0);
-      this.drawPrizeIcon(ctx, i, this.radius - 14 * dpr, 0, dpr);
+      if (isYellowSegment) {
+        // Dark Crimson Red Text on Yellow Segment
+        ctx.fillStyle = '#6E0000';
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+        ctx.shadowBlur = 2 * dpr;
+      } else {
+        // Bold White/Yellow Text on Red Segment
+        ctx.fillStyle = '#FFFFFF';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+        ctx.shadowBlur = 5 * dpr;
+      }
+
+      ctx.fillText(displayTitle, innerRadius - 38 * dpr, 0);
+
+      // Icon
+      this.drawPrizeIcon(ctx, i, innerRadius - 16 * dpr, 0, dpr, isYellowSegment);
       ctx.restore();
     }
 
-    // 3. Studs / Pins
-    for (let i = 0; i < this.segmentCount; i++) {
-      const pinAngle = i * this.segmentAngle;
-      const pinDist = this.radius + 5 * dpr;
-      const px = Math.cos(pinAngle) * pinDist;
-      const py = Math.sin(pinAngle) * pinDist;
+    // 4. CENTER METALLIC GOLD CAP
+    const capOuterRadius = 42 * dpr;
+    const capMidRadius = 32 * dpr;
+    const capInnerRadius = 22 * dpr;
 
-      const pinGrad = ctx.createRadialGradient(px - 1*dpr, py - 1*dpr, 0, px, py, 4*dpr);
-      pinGrad.addColorStop(0, '#FFFFFF');
-      pinGrad.addColorStop(0.6, '#94A3B8');
-      pinGrad.addColorStop(1, '#334155');
-
-      ctx.beginPath();
-      ctx.arc(px, py, 4 * dpr, 0, 2 * Math.PI);
-      ctx.fillStyle = pinGrad;
-      ctx.fill();
-      ctx.strokeStyle = '#FFFFFF';
-      ctx.lineWidth = 1 * dpr;
-      ctx.stroke();
-    }
-
-    // 4. Center Cap
-    const capGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 38 * dpr);
-    capGrad.addColorStop(0, '#FFFFFF');
-    capGrad.addColorStop(0.6, '#F1F5F9');
-    capGrad.addColorStop(1, '#94A3B8');
-
+    // Outer Hub Gold Ring
     ctx.beginPath();
-    ctx.arc(0, 0, 38 * dpr, 0, 2 * Math.PI);
-    ctx.fillStyle = capGrad;
+    ctx.arc(0, 0, capOuterRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = goldGrad;
     ctx.fill();
-    ctx.strokeStyle = '#64748B';
-    ctx.lineWidth = 2 * dpr;
+    ctx.strokeStyle = '#4A2800';
+    ctx.lineWidth = 1.5 * dpr;
     ctx.stroke();
 
+    // Middle Dark Bronze Ring
+    const capDarkGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, capMidRadius);
+    capDarkGrad.addColorStop(0, '#B8860B');
+    capDarkGrad.addColorStop(0.7, '#5C3A00');
+    capDarkGrad.addColorStop(1, '#2E1C00');
+
     ctx.beginPath();
-    ctx.arc(0, 0, 14 * dpr, 0, 2 * Math.PI);
-    ctx.fillStyle = '#2563EB';
+    ctx.arc(0, 0, capMidRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = capDarkGrad;
     ctx.fill();
 
-    ctx.restore();
+    // Inner Brass Dome Button
+    const capInnerGrad = ctx.createRadialGradient(-6 * dpr, -6 * dpr, 0, 0, 0, capInnerRadius);
+    capInnerGrad.addColorStop(0, '#FFFFFF');
+    capInnerGrad.addColorStop(0.3, '#FFE082');
+    capInnerGrad.addColorStop(0.7, '#FFB300');
+    capInnerGrad.addColorStop(1, '#8D6E63');
+
+    ctx.beginPath();
+    ctx.arc(0, 0, capInnerRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = capInnerGrad;
+    ctx.fill();
+    ctx.strokeStyle = '#FFF8E1';
+    ctx.lineWidth = 1 * dpr;
+    ctx.stroke();
+
+    ctx.restore(); // Restore currentAngle rotation
+    ctx.restore(); // Restore translation
   }
 
-  drawPrizeIcon(ctx, index, x, y, dpr) {
+  drawPrizeIcon(ctx, index, x, y, dpr, isYellowSegment) {
     ctx.save();
     ctx.translate(x, y);
-    ctx.strokeStyle = '#475569';
-    ctx.fillStyle = '#475569';
-    ctx.lineWidth = 1.4 * dpr;
+    const color = isYellowSegment ? '#6E0000' : '#FFD700';
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1.6 * dpr;
     
     const s = 6.5 * dpr;
-    switch(index) {
+    switch(index % 12) {
       case 0:
       case 1:
         ctx.beginPath();

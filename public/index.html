@@ -141,22 +141,30 @@
     <!-- Wheel Stage -->
     <section class="wheel-stage">
       
-      <!-- Metallic Pointer -->
+      <!-- Golden Casino Pointer -->
       <div class="wheel-pointer-container" id="wheelPointer">
-        <svg class="wheel-pointer-svg" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="wheel-pointer-svg" viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="metallicPointerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FFFFFF" />
-              <stop offset="40%" stop-color="#94A3B8" />
-              <stop offset="70%" stop-color="#475569" />
-              <stop offset="100%" stop-color="#1E293B" />
+            <linearGradient id="goldPointerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFF9C4" />
+              <stop offset="30%" stop-color="#FFD54F" />
+              <stop offset="65%" stop-color="#FFB300" />
+              <stop offset="85%" stop-color="#FF8F00" />
+              <stop offset="100%" stop-color="#8D6E63" />
             </linearGradient>
-            <filter id="pointerShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.25"/>
+            <linearGradient id="goldHighlightGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8" />
+              <stop offset="100%" stop-color="#FFECB3" stop-opacity="0.1" />
+            </linearGradient>
+            <filter id="pointerShadow" x="-30%" y="-20%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="6" stdDeviation="4" flood-opacity="0.5" flood-color="#000000"/>
             </filter>
           </defs>
-          <path d="M22 46 L38 8 C40 4 36 0 30 0 L14 0 C8 0 4 4 6 8 Z" fill="url(#metallicPointerGrad)" filter="url(#pointerShadow)" stroke="#FFFFFF" stroke-width="1.5"/>
-          <circle cx="22" cy="10" r="4" fill="#2563EB" />
+          <path d="M24 52 L42 12 C44 6 40 1 33 1 L15 1 C8 1 4 6 6 12 Z" fill="url(#goldPointerGrad)" filter="url(#pointerShadow)" stroke="#FFE082" stroke-width="2"/>
+          <path d="M24 52 L42 12 C44 6 40 1 24 1 Z" fill="url(#goldHighlightGrad)" />
+          <path d="M24 50 L24 2" stroke="#FFF8E1" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+          <circle cx="24" cy="11" r="5.5" fill="#D50000" stroke="#FFF8E1" stroke-width="1.5" />
+          <circle cx="22.5" cy="9.5" r="1.8" fill="#FFFFFF" opacity="0.8" />
         </svg>
       </div>
 
