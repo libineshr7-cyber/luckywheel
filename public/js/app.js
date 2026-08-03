@@ -737,18 +737,14 @@
       </html>
     `;
 
-    const blob = new Blob([invoiceHTML], { type: 'text/html' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `LuxeSpin_Invoice_${inv.claimId}.html`;
-    link.click();
-
-    // Also open printable window
-    const printWin = window.open('', '_blank');
-    if (printWin) {
-      printWin.document.write(invoiceHTML);
-      printWin.document.close();
-    }
+    const opt = {
+      margin:       [0.5, 0.5],
+      filename:     `LuxeSpin_Invoice_${inv.claimId}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(invoiceHTML).save();
   }
 
   // Event Listeners

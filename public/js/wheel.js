@@ -241,7 +241,9 @@ class RealisticWheel {
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
 
-      const fontSize = Math.max(12, Math.floor(14 * dpr));
+      const isMobile = window.innerWidth <= 640;
+      const baseFontSize = isMobile ? 18 : 14;
+      const fontSize = Math.max(12, Math.floor(baseFontSize * dpr));
       ctx.font = `900 ${fontSize}px Inter, "Segoe UI", sans-serif`;
 
       const prizeName = this.prizes[i];
