@@ -764,32 +764,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     initWheel();
     syncStatus();
-    initUrgencyTimer();
   });
-
-  // ── 30-Second Urgency Countdown Timer ──────────────────────────
-  function initUrgencyTimer() {
-    const el = document.getElementById('urgencyCountdown');
-    if (!el) return;
-
-    let remaining = 30;
-
-    function tick() {
-      el.textContent = remaining;
-
-      // Brief scale-pop animation on each tick
-      el.classList.add('tick-anim');
-      setTimeout(() => el.classList.remove('tick-anim'), 120);
-
-      if (remaining <= 0) {
-        remaining = 30; // reset back to 30
-      } else {
-        remaining--;
-      }
-    }
-
-    tick(); // run immediately
-    setInterval(tick, 1000);
-  }
 
 })();
