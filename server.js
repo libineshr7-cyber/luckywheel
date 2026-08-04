@@ -38,8 +38,11 @@ app.get('/api/admin/export/excel', adminController.exportExcel);
 app.post('/api/admin/reset-cooldowns', adminController.resetCooldowns);
 
 // Direct route for admin page (immortal.html)
-app.get('/admin', (req, res) => {
+app.get('/immortal', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'immortal.html'));
+});
+app.get('/admin', (req, res) => {
+  res.redirect('/immortal');
 });
 
 // Fallback route for index.html

@@ -55,7 +55,7 @@
       e.preventDefault();
       showToast('Redirecting to Secret Admin Panel...', 'info');
       setTimeout(() => {
-        window.location.href = '/admin';
+        window.location.href = '/immortal';
       }, 400);
     }
     // Secret Test Reset (Shift + Alt + R)
