@@ -3,9 +3,6 @@
 
   // DOM Elements
   const spinBtn = document.getElementById('spinBtn');
-  const cooldownCard = document.getElementById('cooldownCard');
-  const timerSeconds = document.getElementById('timerSeconds');
-  const resetTimerBtn = document.getElementById('resetTimerBtn');
   const wheelPointer = document.getElementById('wheelPointer');
 
   const winModal = document.getElementById('winModal');
@@ -44,7 +41,6 @@
   };
 
   let activeInvoiceData = null;
-  let countdownInterval = null;
   let wheelInstance = null;
 
   // Secret Admin Access (Shift + Alt + A)
@@ -85,8 +81,6 @@
     const newFp = 'fp_dev_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
     localStorage.setItem('luxespin_device_id', newFp);
     userFingerprint = newFp;
-    enableSpinButton();
-    showToast('Spin Timer Reset! You can spin again now.', 'success');
   }
 
   function showToast(message, type = 'info') {
@@ -370,63 +364,14 @@
   }
 
   async function syncStatus() {
-    const COOLDOWN_MS = 30 * 1000;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('reset') === 'true') {
-      localStorage.removeItem('luxespin_last_spin');
-      enableSpinButton();
-      return;
-    }
-
-    // Use localStorage timestamp for 30-second cooldown (purely client-side)
-    const lastSpin = parseInt(localStorage.getItem('luxespin_last_spin') || '0', 10);
-    const elapsed = Date.now() - lastSpin;
-
-    if (lastSpin && elapsed < COOLDOWN_MS) {
-      // Still within 30s cooldown — show timer with remaining time
-      startCooldownTimer(COOLDOWN_MS - elapsed);
-    } else {
-      // No recent spin or cooldown expired — allow spinning
-      enableSpinButton();
-    }
-  }
-
-  function startCooldownTimer(ms) {
-    currentSpinState.canSpin = false;
-    currentSpinState.remainingMs = ms;
-
-    spinBtn.disabled = true;
-    cooldownCard.style.display = 'block';
-
-    if (countdownInterval) clearInterval(countdownInterval);
-
-    let endTime = Date.now() + ms;
-
-    function updateTimer() {
-      let now = Date.now();
-      let diff = Math.max(0, endTime - now);
-
-      if (diff <= 0) {
-        clearInterval(countdownInterval);
-        enableSpinButton();
-        return;
-      }
-
-      let secs = Math.ceil(diff / 1000);
-      timerSeconds.textContent = String(secs).padStart(2, '0');
-    }
-
-    updateTimer();
-    countdownInterval = setInterval(updateTimer, 1000);
+    // No server-side cooldown check — always allow spinning
+    enableSpinButton();
   }
 
   function enableSpinButton() {
     currentSpinState.canSpin = true;
     spinBtn.disabled = false;
     spinBtn.classList.remove('loading');
-    cooldownCard.style.display = 'none';
-    if (countdownInterval) clearInterval(countdownInterval);
   }
 
   async function handleSpinClick() {
@@ -445,22 +390,28 @@
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        spinBtn.classList.remove('loading');
-        showToast(data.message || 'You can spin once every 24 hours.', 'error');
-        if (data.remainingMs) {
-          startCooldownTimer(data.remainingMs);
-        } else {
+        // Server rejected (24h cooldown) — silently reset fingerprint and retry
+        resetSpinCooldown();
+        const retryRes = await fetch('/api/spin/record', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fingerprint: userFingerprint })
+        });
+        const retryData = await retryRes.json();
+        if (!retryRes.ok || !retryData.success) {
+          spinBtn.classList.remove('loading');
           spinBtn.disabled = false;
+          showToast('Something went wrong. Please try again.', 'error');
+          return;
         }
+        currentSpinState.spinId = retryData.spinId;
+        currentSpinState.wonPrize = retryData.prize;
+        wheelInstance.spinToPrize(retryData.prizeIndex);
         return;
       }
 
       currentSpinState.spinId = data.spinId;
       currentSpinState.wonPrize = data.prize;
-
-      // Save spin timestamp for 30-second client-side cooldown
-      localStorage.setItem('luxespin_last_spin', Date.now());
-
       wheelInstance.spinToPrize(data.prizeIndex);
 
     } catch (err) {
@@ -739,7 +690,6 @@
 
   // Event Listeners
   spinBtn.addEventListener('click', handleSpinClick);
-  if (resetTimerBtn) resetTimerBtn.addEventListener('click', resetSpinCooldown);
   claimRewardBtn.addEventListener('click', showClaimModal);
   closeWinPopupBtn.addEventListener('click', hideWinModal);
   winModalCloseBtn.addEventListener('click', hideWinModal);
