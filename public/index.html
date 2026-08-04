@@ -31,6 +31,67 @@
     .prize-img-container:hover .prize-photo-img {
       transform: scale(1.06);
     }
+    /* 30-Second Urgency Timer */
+    .urgency-timer-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 22px;
+      padding: 18px 28px;
+      background: linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(251,146,60,0.08) 100%);
+      border: 1.5px solid rgba(239,68,68,0.25);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      animation: urgencyPulse 2s ease-in-out infinite;
+    }
+    @keyframes urgencyPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.15); }
+      50% { box-shadow: 0 0 0 10px rgba(239,68,68,0.0); }
+    }
+    .urgency-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .urgency-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: blinkDot 1s steps(1) infinite;
+      flex-shrink: 0;
+    }
+    @keyframes blinkDot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .urgency-countdown {
+      font-size: 46px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      transition: transform 0.1s;
+    }
+    .urgency-countdown.tick-anim {
+      transform: scale(1.12);
+    }
+    .urgency-sublabel {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
     .claim-prize-banner {
       display: flex;
       align-items: center;
@@ -198,6 +259,16 @@
             <span class="timer-unit">Seconds</span>
           </div>
         </div>
+      </div>
+
+      <!-- 30-Second Urgency Reset Timer -->
+      <div class="urgency-timer-wrap">
+        <div class="urgency-label">
+          <span class="urgency-dot"></span>
+          Offer resets in
+        </div>
+        <div class="urgency-countdown" id="urgencyCountdown">30</div>
+        <div class="urgency-sublabel">seconds — Spin now before this slot expires!</div>
       </div>
     </section>
 

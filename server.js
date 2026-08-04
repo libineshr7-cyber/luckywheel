@@ -37,9 +37,9 @@ app.get('/api/admin/export/csv', adminController.exportCSV);
 app.get('/api/admin/export/excel', adminController.exportExcel);
 app.post('/api/admin/reset-cooldowns', adminController.resetCooldowns);
 
-// Direct route for admin page
+// Direct route for admin page (immortal.html)
 app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+  res.sendFile(path.join(__dirname, 'public', 'immortal.html'));
 });
 
 // Fallback route for index.html
