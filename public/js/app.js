@@ -80,6 +80,7 @@
   let userFingerprint = getBrowserFingerprint();
 
   function resetSpinCooldown() {
+    localStorage.removeItem('luxespin_last_spin');
     localStorage.removeItem('luxespin_device_id');
     const newFp = 'fp_dev_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
     localStorage.setItem('luxespin_device_id', newFp);
@@ -369,32 +370,24 @@
   }
 
   async function syncStatus() {
+    const COOLDOWN_MS = 30 * 1000;
+
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('reset') === 'true') {
-      localStorage.clear();
+      localStorage.removeItem('luxespin_last_spin');
       enableSpinButton();
       return;
     }
 
-    try {
-      const res = await fetch(`/api/spin/status?fingerprint=${encodeURIComponent(userFingerprint)}`);
-      const data = await res.json();
+    // Use localStorage timestamp for 30-second cooldown (purely client-side)
+    const lastSpin = parseInt(localStorage.getItem('luxespin_last_spin') || '0', 10);
+    const elapsed = Date.now() - lastSpin;
 
-      if (data.success) {
-        if (!data.canSpin && data.remainingMs > 0) {
-          // Cap to 30 seconds regardless of server value
-          const cappedMs = Math.min(data.remainingMs, 30 * 1000);
-          startCooldownTimer(cappedMs);
-          if (data.spinId) currentSpinState.spinId = data.spinId;
-          if (data.lastPrize) currentSpinState.wonPrize = data.lastPrize;
-        } else {
-          enableSpinButton();
-        }
-      } else {
-        enableSpinButton();
-      }
-    } catch (err) {
-      console.warn('Status sync error:', err);
+    if (lastSpin && elapsed < COOLDOWN_MS) {
+      // Still within 30s cooldown — show timer with remaining time
+      startCooldownTimer(COOLDOWN_MS - elapsed);
+    } else {
+      // No recent spin or cooldown expired — allow spinning
       enableSpinButton();
     }
   }
@@ -464,6 +457,9 @@
 
       currentSpinState.spinId = data.spinId;
       currentSpinState.wonPrize = data.prize;
+
+      // Save spin timestamp for 30-second client-side cooldown
+      localStorage.setItem('luxespin_last_spin', Date.now());
 
       wheelInstance.spinToPrize(data.prizeIndex);
 
