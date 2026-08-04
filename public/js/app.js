@@ -4,8 +4,6 @@
   // DOM Elements
   const spinBtn = document.getElementById('spinBtn');
   const cooldownCard = document.getElementById('cooldownCard');
-  const timerHours = document.getElementById('timerHours');
-  const timerMinutes = document.getElementById('timerMinutes');
   const timerSeconds = document.getElementById('timerSeconds');
   const resetTimerBtn = document.getElementById('resetTimerBtn');
   const wheelPointer = document.getElementById('wheelPointer');
@@ -365,7 +363,7 @@
           showWinModal(prizeName);
         }, 300);
 
-        startCooldownTimer(24 * 60 * 60 * 1000);
+        startCooldownTimer(30 * 1000);
       }
     });
   }
@@ -384,7 +382,9 @@
 
       if (data.success) {
         if (!data.canSpin && data.remainingMs > 0) {
-          startCooldownTimer(data.remainingMs);
+          // Cap to 30 seconds regardless of server value
+          const cappedMs = Math.min(data.remainingMs, 30 * 1000);
+          startCooldownTimer(cappedMs);
           if (data.spinId) currentSpinState.spinId = data.spinId;
           if (data.lastPrize) currentSpinState.wonPrize = data.lastPrize;
         } else {
@@ -420,14 +420,8 @@
         return;
       }
 
-      let totalSecs = Math.floor(diff / 1000);
-      let hours = Math.floor(totalSecs / 3600);
-      let minutes = Math.floor((totalSecs % 3600) / 60);
-      let seconds = totalSecs % 60;
-
-      timerHours.textContent = String(hours).padStart(2, '0');
-      timerMinutes.textContent = String(minutes).padStart(2, '0');
-      timerSeconds.textContent = String(seconds).padStart(2, '0');
+      let secs = Math.ceil(diff / 1000);
+      timerSeconds.textContent = String(secs).padStart(2, '0');
     }
 
     updateTimer();
