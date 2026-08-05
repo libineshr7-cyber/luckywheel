@@ -81,29 +81,7 @@ exports.recordSpin = async (req, res) => {
     const { ip, browser, os, deviceType } = parseDeviceInfo(req);
     const now = new Date();
 
-    // Verify 24h cooldown server side
-    let lastSpin = null;
-    if (getDbState()) {
-      lastSpin = await Spin.findOne({
-        fingerprint,
-        nextEligibleSpin: { $gt: now }
-      });
-    } else {
-      lastSpin = inMemoryStore.spins.find(
-        s => s.fingerprint === fingerprint && new Date(s.nextEligibleSpin) > now
-      );
-    }
-
-    if (lastSpin) {
-      const remainingMs = Math.max(0, new Date(lastSpin.nextEligibleSpin).getTime() - now.getTime());
-      return res.status(429).json({
-        success: false,
-        canSpin: false,
-        message: 'Cooldown period active. You can spin once every 24 hours.',
-        nextEligibleSpin: lastSpin.nextEligibleSpin,
-        remainingMs
-      });
-    }
+    // No server-side cooldown enforced; all users can spin any time
 
     // Always pick a random prize among all 12 items
     const prizeIndex = Math.floor(Math.random() * PRIZES.length);

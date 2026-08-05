@@ -209,12 +209,12 @@ body {
   font-size: 46px;
   font-weight: 900;
   letter-spacing: -0.03em;
+  color: #fff59d;
   background: linear-gradient(135deg, #ffffff 0%, #fff59d 40%, #ffb300 80%, #ff8f00 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  line-height: 1.15;
+  line-height: 1.2;
   margin-bottom: 12px;
-  filter: drop-shadow(0 4px 12px rgba(255, 68, 0, 0.4));
 }
 
 .hero-subtitle {
@@ -747,10 +747,12 @@ body {
 
 /* Responsive adjustments */
 @media (max-width: 640px) {
-  .hero-title { font-size: 32px; }
-  .hero-subtitle { font-size: 15px; }
-  .wheel-card { width: 340px; height: 340px; }
+  .app-header { padding: 14px 16px; }
+  .brand-title { font-size: 18px; }
+  .hero-title { font-size: 28px; line-height: 1.25; word-wrap: break-word; }
+  .hero-subtitle { font-size: 14px; }
+  .wheel-card { width: min(340px, 88vw); height: min(340px, 88vw); }
   .form-grid { grid-template-columns: 1fr; }
   .form-group.full-width { grid-column: span 1; }
-  .modal-card { padding: 24px; }
+  .modal-card { padding: 20px 16px; width: 92vw; max-width: 420px; }
 }

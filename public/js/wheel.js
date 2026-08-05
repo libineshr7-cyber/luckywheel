@@ -241,15 +241,25 @@ class RealisticWheel {
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
 
-      const isMobile = window.innerWidth <= 640;
-      const baseFontSize = isMobile ? 18 : 14;
-      const fontSize = Math.max(12, Math.floor(baseFontSize * dpr));
-      ctx.font = `900 ${fontSize}px Inter, "Segoe UI", sans-serif`;
+      // Dynamically scale base font size with canvas size (no oversized text on mobile)
+      const scaleFactor = this.size / 520;
+      const targetFontSizePx = Math.max(9, Math.min(13, 12.5 * scaleFactor));
+      let currentFontSizeCanvas = Math.round(targetFontSizePx * dpr);
 
       const prizeName = this.prizes[i];
       let displayTitle = prizeName;
-      if (displayTitle.length > 17) {
-        displayTitle = displayTitle.substring(0, 15) + '...';
+
+      // Calculate max width available for text between outer icon & center cap
+      const capOuterRadius = 42 * dpr;
+      const textOuterOffset = innerRadius - 34 * dpr;
+      const textMaxRadialWidth = textOuterOffset - capOuterRadius - 8 * dpr;
+
+      ctx.font = `900 ${currentFontSizeCanvas}px Inter, "Segoe UI", sans-serif`;
+
+      // Auto-fit font size if title is long so letters never overlap or break
+      while (ctx.measureText(displayTitle).width > textMaxRadialWidth && currentFontSizeCanvas > 7 * dpr) {
+        currentFontSizeCanvas -= 1 * dpr;
+        ctx.font = `900 ${currentFontSizeCanvas}px Inter, "Segoe UI", sans-serif`;
       }
 
       if (isYellowSegment) {
@@ -261,10 +271,10 @@ class RealisticWheel {
         // Bold White/Yellow Text on Red Segment
         ctx.fillStyle = '#FFFFFF';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-        ctx.shadowBlur = 5 * dpr;
+        ctx.shadowBlur = 4 * dpr;
       }
 
-      ctx.fillText(displayTitle, innerRadius - 38 * dpr, 0);
+      ctx.fillText(displayTitle, textOuterOffset, 0);
 
       // Icon
       this.drawPrizeIcon(ctx, i, innerRadius - 16 * dpr, 0, dpr, isYellowSegment);
